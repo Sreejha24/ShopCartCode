@@ -1,0 +1,32 @@
+public async  Task<IActionResult> Sorting(string data)
+        {
+            ViewData["EmpId"] = string.IsNullOrEmpty(data) ? "EmpId" : " ";
+            ViewData["EmpName"] = string.IsNullOrEmpty(data) ? "EmpName" : " ";
+            ViewData["Salary"] = string.IsNullOrEmpty(data) ? "Salary" : " ";
+            ViewData["City"] = string.IsNullOrEmpty(data) ? "City" : " ";
+            ViewData["DeptId"] = string.IsNullOrEmpty(data) ? "DeptId" : " ";
+
+            var data1 = from e in _context.Employee
+                       select e;
+            switch (data)
+            {
+                case "EmpId":
+                    data1 = data1.OrderBy(s => s.EmpId);
+                    break;
+                case "EmpName":
+                    data1 = data1.OrderBy(s => s.EmpName);
+                    break;
+                case "Salary":
+                    data1 = data1.OrderBy(s => s.Salary);
+                    break;
+                case "City":
+                    data1 = data1.OrderBy(s => s.City);
+                    break;
+                case "DeptId":
+                    data1 = data1.OrderBy(s => s.DeptId);
+                    break;
+                default:
+                    data1 = data1.OrderBy(s => s.EmpId);
+                    break;
+            }
+            return View(data1);

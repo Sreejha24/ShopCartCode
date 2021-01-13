@@ -1,0 +1,25 @@
+ //app.Use(async (context, next) =>
+            //{
+            //    await context.Response.WriteAsync("this is First Middle ware....!");
+            //    await next();
+            //});
+
+            //app.Use(async (conetxt, next) =>
+            //{
+            //    conetxt.Response.Redirect("https://www.w3schools.com/");
+            //    await next();
+            //});
+
+            //app.Use(async (conetxt, next) =>
+            //{
+            //    conetxt.Response.Redirect("https://www.tutorialsteacher.com/mvc/asp.net-mvc-tutorials");
+            //    await next();
+            //});
+
+            //app.Run(async (context) =>
+            //{
+            //    await context.Response.WriteAsync("Iam From Run Middle Ware");
+        
+    //});
+--------------------
+//await context.Response.WriteAsync("My Custom middleware");

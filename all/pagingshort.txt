@@ -1,0 +1,16 @@
+  public async Task<IActionResult> Paging(int ? page)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = 4;
+
+            var data = _context.Employee.OrderBy(e=>e.Id).ToPagedList(pageNumber, pageSize);
+            return View(data);
+        }
+------------------------
+@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<project1.Models.Employee>
+@{ 
+    ViewData["Title"] = "Paging";
+}
+------------------
+@Html.PagedListPager(Model,page=>Url.Action("Paging",new {page=page }))

@@ -1,0 +1,65 @@
+    public class SessionAndCookieAndCacheController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _cacheData;
+        private readonly IDistributedCache _rcache;
+
+        public SessionAndCookieAndCacheController(ApplicationDbContext context, IMemoryCache cacheData,IDistributedCache Rcache)
+        {
+            _context = context;
+            _cacheData = cacheData;
+            _rcache = Rcache;
+        }
+        public IActionResult Cache()
+        {
+            var cache = _cacheData.Get("Employeedetails");
+            IList<Employee> data = new List<Employee>();
+            if(cache == null)
+            {
+                 data = _context.Employee.ToList();
+                 var cacheOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(60));
+                _cacheData.Set("Employeedetails", data, cacheOptions);
+            }
+            else
+            {
+                data = (IList<Employee>)cache;
+            }
+            return View(data);
+        }
+
+
+
+
+
+
+        [ResponseCache(Duration = 30000)]
+        public async Task<IActionResult> ResponseCaching()
+        {
+            return View("ResponseCaching", await _context.Employee.ToListAsync());
+        }
+
+
+
+
+
+
+        public async  Task<IActionResult> RedisCache()
+        {
+            var cache = _rcache.GetString("GetEmployee");
+          
+            IList<Employee> data = new List<Employee>();
+            if(string.IsNullOrEmpty(cache))
+            {
+                data = _context.Employee.ToList();
+                var dataString = JsonConvert.SerializeObject(data);
+                var cacheOptions = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(25));
+                await _rcache.SetStringAsync("GetEmployee", dataString, cacheOptions);
+                return Json(dataString);
+            }
+            else
+            {
+                data= JsonConvert.DeserializeObject<IList<Employee>>(cache);
+                return Json(data);
+            }
+           
+        }

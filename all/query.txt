@@ -1,0 +1,49 @@
+      public IActionResult RawQuery(int id)
+        {
+            var sql = "SELECT * FROM People WHERE AutoID = {0}";
+
+            var data = _context.Person.FromSqlRaw(sql, id).FirstOrDefault();
+
+            return View(data);
+        }
+
+
+        public IActionResult RawQueryComplex(int id)
+        {
+            IList<PersonAddressView> list = new List<PersonAddressView>();
+            using (var conn = _context.Database.GetDbConnection())
+            {
+                conn.Open();
+                using (var command = conn.CreateCommand())
+                {
+                    var sql = "SELECT P.AutoId, P.FirstName, P.LastName, P.Age, P.Active, P.AddressId, A.AddressLine, A.City, A.Pin FROM People P, Addresses A " +
+                        " WHERE P.AddressId = A.AddressId";
+                    command.CommandText = sql;
+                    using(var reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                var record = new PersonAddressView()
+                                {
+                                    Active = reader.GetBoolean(4),
+                                    AddressId = reader.GetInt32(5),
+                                    AddressLine = reader.GetString(6),
+                                    Age = reader.GetInt32(3),
+                                    AutoId = reader.GetInt32(0),
+                                    City = reader.GetString(7),
+                                    FirstName = reader.GetString(1),
+                                    LastName = reader.GetString(2),
+                                    Pin = reader.GetString(8)
+                                };
+                                list.Add(record);
+                            }
+                        }
+                    } // reader
+                } // command
+                conn.Close();
+            } // connection
+
+            return View(list);
+        }

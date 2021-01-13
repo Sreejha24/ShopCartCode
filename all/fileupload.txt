@@ -1,0 +1,45 @@
+ public async Task<IActionResult> Create([Bind("Id,EmpName,Salary,DeptNo,photo")] FileUpload fileupload,IFormFile photo)
+        {
+            if (ModelState.IsValid)
+            {
+                string path = Environment.CurrentDirectory;
+                string fullname = Path.Combine(path, "wwwroot", "image", photo.FileName);
+                fileupload.photo= fullname;
+                _context.Add(fileupload);
+                await _context.SaveChangesAsync();
+                if(photo.Length>0)
+                {
+                    using(var stream=System.IO.File.Create(fullname))
+                    {
+                        await photo.CopyToAsync(stream);
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            return View(fileupload);
+---------------------
+  [DataType(DataType.Upload)]
+        public string photo { get; set; }
+----------------
+USE [gmekala]
+GO
+
+/****** Object:  Table [dbo].[FileUpload]    Script Date: 12-01-2021 09:32:03 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[FileUpload](
+	[EmpId] [int] NOT NULL,
+	[EmpName] [varchar](50) NOT NULL,
+	[photo] [image] NULL,
+ CONSTRAINT [PK_FileUpload] PRIMARY KEY CLUSTERED 
+(
+	[EmpId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+
